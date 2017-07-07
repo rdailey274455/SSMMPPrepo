@@ -2,19 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TitleDrawing:MonoBehaviour
-	{
+public class SlowSpin : MonoBehaviour {
 
 	// Use this for initialization
-	void Start()
-		{
+	void Start () {
 		
-
-		}
+	}
 	
 	// Update is called once per frame
-	void Update()
-		{
-		
-		}
+	void Update () {
+		transform.Rotate(new Vector3(0f,1f,0f),1f);
 	}
+}
