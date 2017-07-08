@@ -1,0 +1,35 @@
+2017-07-07
+
+LAUNCH
+> (After getting in but before launch) Two little axes with timing-based targeting (Kirby's Dream Course)
+> Target based on mission route
+> Farther away from target means longer trip (total distance) and/or more/harder obstacles or may make launch fail immediately or early
+
+MISSION END
+> Mission over: funny cutscenes
+> Mission successful: parachute out, big explosion in background
+
+CONTROLS
+> Aim with mouse
+> Thrust with left click
+> Shield with right click
+
+GAMEPLAY
+> Starts in air after launch animation
+> Rocket is initially at an upward angle, curves down to a downward angle by end of trip
+> Constantly gravitating towards left side of screen, thrusting needed to stay in the game
+> With warning prior, going off screen will result in a mission over
+
+GAMEPLAY (HUD)
+> HP, obstacles will lower this, mission over when depleted
+> Score, distance elapsed and dodged obstacles will increase this (nearer dodge = bigger bonus?)
+> Distance elapsed and total distance
+
+UPGRADABLE THINGS (too many?)
+> Aim agility
+> Thrust amount, power, discharge rates, and recharge rates
+> Shield amount, stability (how hard will obsticles damage it), discharge rates, and recharge rates
+> Launch target timing slower, greater margin for error
+> Area on map covered by successful mission
+> Allowed distance from base for mission destination
+> More bases
