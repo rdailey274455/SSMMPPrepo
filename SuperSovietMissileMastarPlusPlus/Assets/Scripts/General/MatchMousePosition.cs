@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MatchMousePosition:MonoBehaviour
 	{
-	
+
 	/* // old way, didn't work
     private Vector3 mousePos3D=new Vector3();
 	private Vector2 mousePos2D=new Vector2();
@@ -23,8 +23,8 @@ public class MatchMousePosition:MonoBehaviour
 		}
 	*/
 
-	
 
+	/* // Ray way works but is probably expensive
 	void Update()
 		{
 		Ray mouseRay=Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -37,11 +37,16 @@ public class MatchMousePosition:MonoBehaviour
 			transform.position=mouseRay.GetPoint(rayDistance);
 			}
 		}
-	
-	
-	
-	
-	
+	*/
+
+	private void Update()
+		{
+		transform.position=Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x,Input.mousePosition.y,-Camera.main.transform.position.z));
+		}
+
+
+
+
 
 
 

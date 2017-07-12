@@ -26,7 +26,7 @@ public class ReticleClickEffects:MonoBehaviour
 		{
 		SpriteRenderer sprRen=GetComponent<SpriteRenderer>();
 		
-		if (Input.GetMouseButton(0))
+		if (Input.GetButton("Fire1"))
 			{
 			sprRen.color=new Color (sprRen.color.r,sprRen.color.g,sprRen.color.b,click_alpha);
 			transform.localScale=click_scale*Vector3.one;

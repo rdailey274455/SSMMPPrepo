@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/WorldMap01.unity
+- path: Assets/Scenes/MissileGameplayScreen.unity
   isLoaded: 1
   isActive: 1
