@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 198781882671962756}
   - component: {fileID: 199051055771350710}
   - component: {fileID: 82221382948919028}
+  - component: {fileID: 114980846654519016}
   m_Layer: 0
   m_Name: Explosion
   m_TagString: Untagged
@@ -35,8 +36,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1658077862700284}
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0.3148884, y: 2.159248, z: 0.1796875}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -53,7 +54,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: dcc4577af261a344cbca568849fbd624, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.6
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -122,6 +123,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+--- !u!114 &114980846654519016
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1658077862700284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e291b87b0ccc138458cbb6952f43e7e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  explosionTime: 1.2
 --- !u!198 &198781882671962756
 ParticleSystem:
   m_ObjectHideFlags: 1
@@ -179,7 +192,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: 1242692652
+  randomSeed: 548348182
   InitialModule:
     serializedVersion: 3
     enabled: 1
