@@ -7,39 +7,65 @@ public class GameplayManagement:MonoBehaviour
 	{
 	public Vector2 windGravity=new Vector2(3f,0f);
 
-	private float gameScore=0f;
-	private float missile_kmps=0.3f;
+	private int gameScore=0;
+	private float missile_kmps=3.1f;
 	private int missile_HP_max;
 	private int missile_HP;
-	private float missile_ThrustFuel_max;
-	private float missile_ThrustFuel;
-	private float missile_ThrustFuel_burn;
-	private float missile_ThrustFuel_regen;
+	private float missile_fuel_max;
+	private float missile_fuel;
+	private float missile_fuel_burn;
+	private float missile_fuel_regen;
+	private float mission_time=0;
+	private bool mission_live=true;
+	public float missionOverShowSeconds=3;
 	
+	
+	public GameObject missileObject;
+
+	public GameObject hudCanvas;
+
 	// two variables needed for bar
 	public GameObject HPBarLevelImage;
 	private BarLevelScaling HPBarLevelImageScript;
 	// two variables needed for bar
 	public GameObject FuelBarLevelImage;
 	private BarLevelScaling FuelBarLevelImageScript;
-
+	
 	public GameObject scoreText;
-	public GameObject hudCanvas;
+	public GameObject timeText;
+	public GameObject distanceText;
+	public GameObject missionOverText;
 	
 	void Start ()
 		{
 		setMissileInitial_HP(100);
-		setMissileInitial_ThrustFuel(20f,1.6f,1.5f);
+		setMissileInitial_fuel(20f,1.6f,1.5f);
 		HPBarLevelImageScript=HPBarLevelImage.GetComponent<BarLevelScaling>(); // initialize bar
 		FuelBarLevelImageScript=FuelBarLevelImage.GetComponent<BarLevelScaling>(); // initialize bar
+		if (missileObject==null) missileObject=GameObject.FindGameObjectWithTag("Missile");
 		}
 
 	void Update()
 		{
-		missileUpdateThrustFuel(Input.GetButton("Fire1"));
+
+		// update hud items
 		HPBarLevelImageScript.setPercentage((float)missile_HP/missile_HP_max); // update bar
-		FuelBarLevelImageScript.setPercentage(getMissileThrustFuelPercentage()); // update bar with method instead of direct calculation
+		FuelBarLevelImageScript.setPercentage(getMissileFuelPercentage()); // update bar with method instead of direct calculation
 		scoreText.GetComponent<Text>().text="Score: "+Mathf.RoundToInt(gameScore);
+		timeText.GetComponent<Text>().text="Time: "+secondsToString(Time.time);
+		distanceText.GetComponent<Text>().text="Dist.: "+Mathf.RoundToInt(missile_kmps*Time.time)+" km";
+
+		
+		// update gameplay items
+		updateMissileFuel(Input.GetButton("Fire1"));
+		if (!mission_live)
+			{
+			if (Time.time>mission_time+missionOverShowSeconds)
+				{
+				Application.Quit();
+				}
+			}
+
 		}
 
 	void FixedUpdate()
@@ -50,26 +76,52 @@ public class GameplayManagement:MonoBehaviour
 
 
 
-	// fuel functions
-	private void missileUpdateThrustFuel(bool thrusting)
+	// central game functions
+	public void missionOver()
 		{
-		if (thrusting) missile_ThrustFuel-=missile_ThrustFuel_burn*Time.deltaTime;
-		else missile_ThrustFuel+=missile_ThrustFuel_regen*Time.deltaTime;
-		if (missile_ThrustFuel>missile_ThrustFuel_max) missile_ThrustFuel=missile_ThrustFuel_max;
-		if (missile_ThrustFuel<0f) missile_ThrustFuel=0f;
+		GameObject finalExplosion=(GameObject)Instantiate(Resources.Load("Prefabs/Explosion"),missileObject.transform.position,Quaternion.identity);
+		finalExplosion.transform.localScale=Vector3.one*5f;
+		mission_live=false;
+		mission_time=Time.time;
+		missionOverText.GetComponent<Text>().enabled=true;
+		missileObject.SetActive(false);
 		}
-	public void setMissileInitial_ThrustFuel(float thrustFuelTankSize,float engineBurnRate,float engineRegenRate)
+	public bool getMissionStatus()
 		{
-		missile_ThrustFuel_max=thrustFuelTankSize;
-		missile_ThrustFuel=missile_ThrustFuel_max;
-		missile_ThrustFuel_burn=Mathf.Abs(engineBurnRate);
-		missile_ThrustFuel_regen=engineRegenRate;
-		}
-	public float getMissileThrustFuelPercentage()
-		{
-		return missile_ThrustFuel/missile_ThrustFuel_max;
+		return mission_live;
 		}
 
+
+
+
+	// fuel functions
+	private void updateMissileFuel(bool thrusting)
+		{
+		if (thrusting) missile_fuel-=missile_fuel_burn*Time.deltaTime;
+		else missile_fuel+=missile_fuel_regen*Time.deltaTime;
+		if (missile_fuel>missile_fuel_max) missile_fuel=missile_fuel_max;
+		if (missile_fuel<0f) missile_fuel=0f;
+		}
+	public void setMissileInitial_fuel(float thrustFuelTankSize,float engineBurnRate,float engineRegenRate)
+		{
+		missile_fuel_max=thrustFuelTankSize;
+		missile_fuel=missile_fuel_max;
+		missile_fuel_burn=Mathf.Abs(engineBurnRate);
+		missile_fuel_regen=engineRegenRate;
+		}
+	public float getMissileFuelPercentage()
+		{
+		return missile_fuel/missile_fuel_max;
+		}
+	public float getMissileMaxFuel()
+		{
+		return missile_fuel_max;
+		}
+	public void missile_fuel_change(float fuelDelta)
+		{
+		missile_fuel+=fuelDelta;
+		if (missile_fuel>missile_fuel_max) missile_fuel=missile_fuel_max;
+		}
 
 
 
@@ -80,10 +132,23 @@ public class GameplayManagement:MonoBehaviour
 		missile_HP_max=HP;
 		missile_HP=missile_HP_max;
 		}
-
-	public void dealDamageToMissile(int incomingDamage)
+	
+	public int getMissileMaxHP()
 		{
-		missile_HP-=Mathf.Abs(incomingDamage);
+		return missile_HP_max;
+		}
+
+	public void missile_HP_change(int HPdelta)
+		{
+		missile_HP+=HPdelta;
+		if (missile_HP<0)
+			{
+			missionOver();
+			}
+		if (missile_HP>missile_HP_max)
+			{
+			missile_HP=missile_HP_max;
+			}
 		}
 
 
@@ -92,22 +157,27 @@ public class GameplayManagement:MonoBehaviour
 	// score functions
 	public float gameScore_dodgedObstacle(float damage_dodged,BoxCollider2D collider_dodged,float closeness_dodged)
 		{
-		float totalIncreaseFromObstacle=1f*damage_dodged+0.1f*vecArea(collider_dodged.size)+(closeness_dodged);
-		gameScore+=totalIncreaseFromObstacle;
+		int totalIncreaseFromObstacle=Mathf.RoundToInt(1.2f*damage_dodged+0.2f*vecArea(collider_dodged.size)+2500f*(1f/closeness_dodged));
+		if (getMissionStatus()) gameScore+=totalIncreaseFromObstacle;
 		return totalIncreaseFromObstacle;
 		}
 	public float gameScore_hitObstacle(float damage_received,BoxCollider2D collider_hit)
 		{
-		float totalLossFromObstacle=1f*damage_received+0.1f*vecArea(collider_hit.size);
-		gameScore-=totalLossFromObstacle;
+		int totalLossFromObstacle=-Mathf.RoundToInt(1.2f*damage_received+0.2f*vecArea(collider_hit.size));
+		if (getMissionStatus()) gameScore+=totalLossFromObstacle;
 		return totalLossFromObstacle;
 		}
 	public void showScoreChange(float amount)
 		{
-		GameObject newScoreChangeTextObject=(GameObject)Instantiate(Resources.Load("Prefabs/ScoreChangeText"),new Vector3(scoreText.transform.position.x,scoreText.transform.position.y-32,scoreText.transform.position.z),Quaternion.identity);
-		newScoreChangeTextObject.transform.SetParent(hudCanvas.transform);
-		if (amount>=0) newScoreChangeTextObject.GetComponent<Text>().text="+"+Mathf.RoundToInt(amount);
-		else newScoreChangeTextObject.GetComponent<Text>().text="-"+Mathf.RoundToInt(Mathf.Abs(amount)); // hopefully this puts a minus
+		if (getMissionStatus())
+			{
+			GameObject newScoreChangeTextObject=(GameObject)Instantiate(Resources.Load("Prefabs/ScoreChangeText"),
+				new Vector3(scoreText.transform.position.x,scoreText.transform.position.y,scoreText.transform.position.z),
+				Quaternion.identity);
+			newScoreChangeTextObject.transform.SetParent(hudCanvas.transform);
+			if (amount>=0) newScoreChangeTextObject.GetComponent<Text>().text="+"+amount;
+			else newScoreChangeTextObject.GetComponent<Text>().text="-"+Mathf.Abs(amount);
+			}
 		}
 
 
@@ -118,4 +188,13 @@ public class GameplayManagement:MonoBehaviour
 		return size.x*size.y;
 		}
 
+
+	public string secondsToString(float seconds)
+		{
+		int secondsFloored=Mathf.FloorToInt(seconds);
+		float secondsDecimal=0.01f*Mathf.RoundToInt(100*(seconds-secondsFloored));
+		int minutes=secondsFloored/60;
+		float secondsFinal=(int)(secondsFloored-(60*minutes))+secondsDecimal;
+		return minutes+"'"+secondsFinal+"''";
+		}
 	}

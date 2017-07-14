@@ -52,14 +52,14 @@ MonoBehaviour:
     m_Font: {fileID: 12800000, guid: 1f8298fb050cb0c48be1ff1a68af598b, type: 3}
     m_FontSize: 48
     m_FontStyle: 0
-    m_BestFit: 0
+    m_BestFit: 1
     m_MinSize: 7
     m_MaxSize: 300
-    m_Alignment: 1
+    m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 0
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: +-999999990
 --- !u!114 &114524356768479076
@@ -73,8 +73,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9006ae947fa6b6b47b6dd2d751afd95d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alphaDecreasePerSec: 0.6666667
-  scaleIncreasePerSec: 0.01
+  alphaDecreasePerSec: 1
+  fontSizeIncreasePerSec: 60
 --- !u!222 &222424319209023020
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -96,6 +96,6 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 336.5, y: 263}
-  m_SizeDelta: {x: 581, y: 51}
+  m_AnchoredPosition: {x: 11.2, y: 327.3}
+  m_SizeDelta: {x: 32, y: 32}
   m_Pivot: {x: 0.5, y: 0.5}

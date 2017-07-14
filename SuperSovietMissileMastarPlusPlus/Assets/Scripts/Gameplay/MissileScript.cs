@@ -6,7 +6,9 @@ public class MissileScript:MonoBehaviour
 	{
 	public GameObject reticleObject;
 	public GameObject gameplayManagerObject;
+	private GameplayManagement gameplayManagerScript;
 	public GameObject screenZoneObject;
+	public GameObject liveZoneObject;
 	public GameObject offscreenArrowObject;
 	private SpriteRenderer offscreenArrowSprRen;
 	public AudioSource sirenAudioSource;
@@ -22,8 +24,8 @@ public class MissileScript:MonoBehaviour
 	// private Vector2 targetVector_angleVector;
 	private Vector2 targetVector_almost=new Vector2(0f,0f);
 	private float targetVector_almost_angle;
-	public float targetingSwiftness=0.019f;
-	public float thrustForce=2.2f;
+	public float targetingSwiftness=0.011f;
+	public float thrustForce=2.3f;
 	
 
 	// effect variables
@@ -45,7 +47,9 @@ public class MissileScript:MonoBehaviour
 
 		offscreenArrowSprRen=offscreenArrowObject.GetComponent<SpriteRenderer>();
 
-
+		gameplayManagerScript=gameplayManagerObject.GetComponent<GameplayManagement>();
+		
+		if (reticleObject==null) reticleObject=GameObject.Find("MouseControlReticle");
 
 		// end of start method
 
@@ -61,7 +65,6 @@ public class MissileScript:MonoBehaviour
 			}
 
 
-		// if (reticleObject==null) reticleObject=GameObject.Find("MouseControlReticle");
 		if (reticleObject==null)
 			{
 			// oopsie, can't find reticle object
@@ -74,8 +77,18 @@ public class MissileScript:MonoBehaviour
 	
 	void Update()
 		{
+		// went too far off screen
+		if (!liveZoneObject.GetComponent<Collider2D>().OverlapPoint(transform.position))
+			{
+			gameplayManagerScript.missionOver();
+			}
+
+
+
+
+
 		// thrusting effects
-		if (gameplayManagerObject.GetComponent<GameplayManagement>().getMissileThrustFuelPercentage()>0.0f) // fuel is not depleted
+		if (gameplayManagerScript.getMissileFuelPercentage()>0.0f) // fuel is not depleted
 			{
 			if (Input.GetButton("Fire1"))
 				{
@@ -98,6 +111,7 @@ public class MissileScript:MonoBehaviour
 			}
 
 
+		// if not on screen
 		if (!screenZoneObject.GetComponent<Collider2D>().OverlapPoint(transform.position))
 			{
 			offscreenArrowSprRen.enabled=true;
@@ -143,7 +157,7 @@ public class MissileScript:MonoBehaviour
 
 	void FixedUpdate()
 		{
-		if (Input.GetButton("Fire1") && gameplayManagerObject.GetComponent<GameplayManagement>().getMissileThrustFuelPercentage()>0.0f)
+		if (Input.GetButton("Fire1") && gameplayManagerScript.getMissileFuelPercentage()>0.0f)
 			{
 			Rigidbody2D missileRB2D=GetComponent<Rigidbody2D>();
 

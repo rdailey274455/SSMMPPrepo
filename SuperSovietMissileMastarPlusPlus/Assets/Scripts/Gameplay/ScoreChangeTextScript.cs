@@ -6,8 +6,9 @@ using UnityEngine.UI;
 public class ScoreChangeTextScript:MonoBehaviour
 	{
 
-	public float alphaDecreasePerSec=1f/1.5f;
-	public float scaleIncreasePerSec=0.18f;
+	public float alphaDecreasePerSec=1f/1.2f;
+	private float fontSize_float;
+	public float fontSizeIncreasePerSec=120f;
 
 	// Use this for initialization
 	void Start()
@@ -15,6 +16,9 @@ public class ScoreChangeTextScript:MonoBehaviour
 		Color startColor=GetComponent<Text>().color;
 		startColor.a=1f;
 		GetComponent<Text>().color=startColor;
+
+
+		fontSize_float=GetComponent<Text>().fontSize;
 		}
 	
 	// Update is called once per frame
@@ -23,7 +27,11 @@ public class ScoreChangeTextScript:MonoBehaviour
 		Color currentColor=GetComponent<Text>().color;
 		currentColor.a-=alphaDecreasePerSec*Time.deltaTime;
 		GetComponent<Text>().color=currentColor;
-		transform.localScale+=scaleIncreasePerSec*Vector3.one*Time.deltaTime;
+
+		fontSize_float+=fontSizeIncreasePerSec*Time.deltaTime;
+
+		GetComponent<Text>().fontSize=Mathf.RoundToInt(fontSize_float);
+
 		if (currentColor.a<=0f)
 			{
 			Destroy(gameObject);

@@ -9,32 +9,48 @@ public class ObstacleScript:MonoBehaviour
 	private SpriteRenderer mySprRen;
 	private Rigidbody2D myRB;
 	private Collider2D myCollider;
-	public GameObject missileGameObject;
+	public GameObject missileObject;
 	public GameObject gameplayManagerObject;
-	private GameplayManagement gameplayManagementScript;
+	private GameplayManagement gameplayManagerScript;
 	public GameObject liveZoneObject;
 	private Collider2D liveZoneCollider;
 	private bool unhit=true;
-	private Color hitColor=new Color(0.85f,0.85f,0.85f,0.49f);
+	public Color hitColor=new Color(0.75f,0.75f,0.75f,0.55f);
 	private float lowestDistance;
 
 	// Use this for initialization
 	void Start()
 		{
+		if (liveZoneObject==null) liveZoneObject=GameObject.FindGameObjectWithTag("LiveZone");
+		if (missileObject==null) missileObject=GameObject.FindGameObjectWithTag("Missile");
+		if (gameplayManagerObject==null) gameplayManagerObject=GameObject.FindGameObjectWithTag("GameplayManager");
+
+
+
 		mySprRen=GetComponent<SpriteRenderer>();
 		myRB=GetComponent<Rigidbody2D>();
 		myCollider=GetComponent<BoxCollider2D>();
 		liveZoneCollider=liveZoneObject.GetComponent<Collider2D>();
-		gameplayManagementScript=gameplayManagerObject.GetComponent<GameplayManagement>();
+		gameplayManagerScript=gameplayManagerObject.GetComponent<GameplayManagement>();
 
 		myRB.velocity=new Vector2(speed,0f);
+		if (mySprRen.sprite.name.Equals("helicopter"))
+			{
+			myRB.velocity=new Vector2(speed,-1.4f*(transform.position.y/(transform.position.x*speed)));
+			}
+
+
+		if (gameplayManagerScript.getMissionStatus()) lowestDistance=distance(missileObject.transform.position,transform.position);
 		}
 	
 	// Update is called once per frame
 	void Update()
 		{
-		float currentDistance=distance(missileGameObject.transform.position,transform.position);
-		if (currentDistance<lowestDistance) lowestDistance=currentDistance;
+		if (gameplayManagerScript.getMissionStatus())
+			{
+			float currentDistance=distance(missileObject.transform.position,transform.position);
+			if (currentDistance<lowestDistance) lowestDistance=currentDistance;
+			}
 		}
 
 	private void FixedUpdate()
@@ -44,14 +60,14 @@ public class ObstacleScript:MonoBehaviour
 			// award points
 			if (unhit)
 				{
-				gameplayManagementScript.showScoreChange(
-					gameplayManagementScript.gameScore_dodgedObstacle
+				gameplayManagerScript.showScoreChange(
+					gameplayManagerScript.gameScore_dodgedObstacle
 						(damage,GetComponent<BoxCollider2D>(),lowestDistance)); // this will both increase score and show the increase
 				}
 			// die
 			Destroy(gameObject);
 			}
-		if (unhit && myCollider.IsTouching(missileGameObject.GetComponent<Collider2D>())) // collide with missile
+		if (gameplayManagerScript.getMissionStatus() && unhit && myCollider.IsTouching(missileObject.GetComponent<Collider2D>())) // collide with missile
 			{
 			// change appearance and in-script state
 			unhit=false;
@@ -60,26 +76,26 @@ public class ObstacleScript:MonoBehaviour
 			myRB.isKinematic=false;
 			
 			// damage player
-			gameplayManagementScript.dealDamageToMissile(damage);
+			gameplayManagerScript.missile_HP_change(-Mathf.Abs(damage));
 
 			// move from impact
 			Vector2 hitForce;
-			hitForce.x=transform.position.x-missileGameObject.transform.position.x;
-			hitForce.y=transform.position.y-missileGameObject.transform.position.y;
+			hitForce.x=transform.position.x-missileObject.transform.position.x;
+			hitForce.y=transform.position.y-missileObject.transform.position.y;
 			float hitForceAngle=Mathf.Atan2(hitForce.y,hitForce.x)*Mathf.Rad2Deg;
 			myRB.AddForce(15*hitForce.normalized,ForceMode2D.Impulse);
 			myRB.AddTorque(-10f*hitForceAngle);
 
 			// spawn explosion
 			Vector3 midpoint;
-			midpoint.x=0.5f*(missileGameObject.transform.position.x+transform.position.x);
-			midpoint.y=0.5f*(missileGameObject.transform.position.y+transform.position.y);
-			midpoint.z=0.5f*(missileGameObject.transform.position.z+transform.position.z);
+			midpoint.x=0.5f*(missileObject.transform.position.x+transform.position.x);
+			midpoint.y=0.5f*(missileObject.transform.position.y+transform.position.y);
+			midpoint.z=0.5f*(missileObject.transform.position.z+transform.position.z);
 			Instantiate(Resources.Load("Prefabs/Explosion"),midpoint,Quaternion.identity);
 
 			// lose points
-			gameplayManagementScript.showScoreChange(
-				gameplayManagementScript.gameScore_hitObstacle
+			gameplayManagerScript.showScoreChange(
+				gameplayManagerScript.gameScore_hitObstacle
 					(damage,GetComponent<BoxCollider2D>())); // this will both lower score and show the loss
 			}
 		if (!unhit)

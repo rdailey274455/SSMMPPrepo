@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class FlickeryColors:MonoBehaviour
 	{
-	private System.Random RanNumGen=new System.Random();
 	public Color BGRed=new Color(0.7f,0f,0f);
 	public Color FGWhite=new Color(1f,1f,1f,0.97f);
 	public float flickerRadius=0.05f;
@@ -21,7 +20,7 @@ public class FlickeryColors:MonoBehaviour
 		Camera CameraComponent=GetComponent<Camera>();
 		if (CameraComponent!=null)
 			{
-			float flickerAmount=(flickerRadius*System.Convert.ToSingle(RanNumGen.NextDouble()));
+			float flickerAmount=(flickerRadius*((Random.value*2f)-0.5f));
 			CameraComponent.backgroundColor=AddFloatToRGB(BGRed,flickerAmount);
 			}
 		}
