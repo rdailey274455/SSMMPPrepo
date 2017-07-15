@@ -22,9 +22,9 @@ public class ItemSpawnerScript:MonoBehaviour
 		{
 		while (5==5)
 			{
-			if (0==Mathf.RoundToInt((120f/Time.time)*Random.value)) // literal constant is the time in seconds elapsed when the chance for spawning hits fifty percent
+			if (0==Mathf.RoundToInt((120f/(Time.time+15f))*Random.value)) // literal constant is the time in seconds elapsed when the chance for spawning hits fifty percent (not incorporating the time shift in the denominator)
 				{
-				int itemType=Mathf.RoundToInt(15*Random.value);
+				int itemType=Mathf.RoundToInt(28*Random.value);
 				Vector3 randomPosition=new Vector3(transform.position.x,(Random.value*20)-10,0f);
 				switch (itemType)
 					{
@@ -35,10 +35,10 @@ public class ItemSpawnerScript:MonoBehaviour
 						break;
 					case 3: // health
 					case 4:
+					case 5:
 						Instantiate(Resources.Load("Prefabs/HealthPickup"),randomPosition,Quaternion.identity);
 						break;
-					case 5: // airplane
-					case 6:
+					case 6: // airplane
 					case 7:
 					case 8:
 					case 9:
@@ -61,9 +61,10 @@ public class ItemSpawnerScript:MonoBehaviour
 					case 24:
 					case 25:
 					case 26:
-						Instantiate(Resources.Load("Prefabs/Helicopter"),randomPosition,Quaternion.identity);
+					case 27:
+						Instantiate(Resources.Load("Prefabs/Helicopter"),randomPosition,Quaternion.Euler(0f,0f,30f));
 						break;
-					case 27: // spaceship
+					case 28: // spaceship
 						Instantiate(Resources.Load("Prefabs/HominidSpaceShip"),randomPosition,Quaternion.identity);
 						break;
 					}

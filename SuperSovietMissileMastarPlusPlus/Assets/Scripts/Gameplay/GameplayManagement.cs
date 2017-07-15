@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+using System.IO;
+
 public class GameplayManagement:MonoBehaviour
 	{
 	public Vector2 windGravity=new Vector2(3f,0f);
-
+	
 	private int gameScore=0;
+	private int finalScore=0;
+	private float finalDistance;
 	private float missile_kmps=3.1f;
 	private int missile_HP_max;
 	private int missile_HP;
@@ -15,11 +19,15 @@ public class GameplayManagement:MonoBehaviour
 	private float missile_fuel;
 	private float missile_fuel_burn;
 	private float missile_fuel_regen;
-	private float mission_time=0;
+	private float finalTime=0;
 	private bool mission_live=true;
-	public float missionOverShowSeconds=3;
-	
-	
+	private float speedMult=1f;
+	[SerializeField] private AudioSource musicAudioSource;
+	[SerializeField] private float speedMult_deltaPerSec=0.036f;
+	private string playerName="Player1";
+	private bool acceptingTextInput=false;
+	public float gameOverMusicDelay=2f;
+
 	public GameObject missileObject;
 
 	public GameObject hudCanvas;
@@ -32,37 +40,72 @@ public class GameplayManagement:MonoBehaviour
 	private BarLevelScaling FuelBarLevelImageScript;
 	
 	public GameObject scoreText;
+	public GameObject quitButton;
 	public GameObject timeText;
 	public GameObject distanceText;
 	public GameObject missionOverText;
+	public GameObject missionReportText;
+	private Text missionReportTextComponent;
 	
 	void Start ()
 		{
 		setMissileInitial_HP(100);
-		setMissileInitial_fuel(20f,1.6f,1.5f);
+		setMissileInitial_fuel(20f,1.8f,1.5f);
 		HPBarLevelImageScript=HPBarLevelImage.GetComponent<BarLevelScaling>(); // initialize bar
 		FuelBarLevelImageScript=FuelBarLevelImage.GetComponent<BarLevelScaling>(); // initialize bar
+
+		if (musicAudioSource==null) musicAudioSource=GetComponent<AudioSource>();
+		musicAudioSource.volume=1.0f;
+
 		if (missileObject==null) missileObject=GameObject.FindGameObjectWithTag("Missile");
+
+		missionReportTextComponent=missionReportText.GetComponent<Text>();
 		}
 
 	void Update()
 		{
 
+
+
 		// update hud items
+		Cursor.visible=false;
 		HPBarLevelImageScript.setPercentage((float)missile_HP/missile_HP_max); // update bar
 		FuelBarLevelImageScript.setPercentage(getMissileFuelPercentage()); // update bar with method instead of direct calculation
-		scoreText.GetComponent<Text>().text="Score: "+Mathf.RoundToInt(gameScore);
-		timeText.GetComponent<Text>().text="Time: "+secondsToString(Time.time);
-		distanceText.GetComponent<Text>().text="Dist.: "+Mathf.RoundToInt(missile_kmps*Time.time)+" km";
-
+		if (scoreText.activeSelf) scoreText.GetComponent<Text>().text="Score: "+Mathf.RoundToInt(gameScore);
+		if (timeText.activeSelf) timeText.GetComponent<Text>().text="Time: "+secondsToString(Time.time);
+		if (distanceText.activeSelf) distanceText.GetComponent<Text>().text="Dist.: "+Mathf.RoundToInt(missile_kmps*Time.time*getSpeedMult())+" km";
 		
 		// update gameplay items
+		speedMult+=speedMult_deltaPerSec*Time.deltaTime;
 		updateMissileFuel(Input.GetButton("Fire1"));
-		if (!mission_live)
+		if (!getMissionStatus())
 			{
-			if (Time.time>mission_time+missionOverShowSeconds)
+			missionReportTextComponent.text="Your score: "+finalScore+"\nYour time: "+secondsToString(finalTime)+"\nYour distance: "+finalDistance+" km"+"\nYour name: "+playerName;
+			
+			if (Time.time>=finalTime+gameOverMusicDelay && !musicAudioSource.isPlaying) musicAudioSource.Play();
+
+			if (acceptingTextInput)
 				{
-				Application.Quit();
+				if (Input.anyKeyDown)
+					{
+					if (Input.inputString=="\b")
+						{
+						playerName=backspaced(playerName);
+						}
+					else if (Input.inputString=="\n" || Input.inputString=="\r")
+						{
+						acceptingTextInput=false;
+						}
+					else
+						{
+						playerName+=Input.inputString;
+						}
+					}
+				if (Mathf.RoundToInt(3f*Time.time)%2==0) missionReportTextComponent.text+="_";
+				}
+			else
+				{
+				quitButton.SetActive(true);
 				}
 			}
 
@@ -80,18 +123,40 @@ public class GameplayManagement:MonoBehaviour
 	public void missionOver()
 		{
 		GameObject finalExplosion=(GameObject)Instantiate(Resources.Load("Prefabs/Explosion"),missileObject.transform.position,Quaternion.identity);
-		finalExplosion.transform.localScale=Vector3.one*5f;
+		finalExplosion.transform.localScale=Vector3.one*6.3f;
+		finalScore=gameScore;
 		mission_live=false;
-		mission_time=Time.time;
+		finalTime=Time.time;
+		finalDistance=Mathf.RoundToInt(missile_kmps*finalTime*getSpeedMult());
 		missionOverText.GetComponent<Text>().enabled=true;
+		missionReportTextComponent.enabled=true;
+		acceptingTextInput=true;
 		missileObject.SetActive(false);
+		scoreText.SetActive(false);
+		timeText.SetActive(false);
+		distanceText.SetActive(false);
+		missileObject.GetComponent<MissileScript>().offscreenArrowObject.SetActive(false);
+		musicAudioSource.Stop();
+		musicAudioSource.volume=0.72f;
+		musicAudioSource.clip=(AudioClip)Resources.Load("Audio/gameover");
 		}
 	public bool getMissionStatus()
 		{
 		return mission_live;
 		}
-
-
+	public float getSpeedMult()
+		{
+		return speedMult;
+		}
+	public void newHighScore()
+		{
+		// load the list of high scores
+		List<HighScore> highScores=HighScore.loadHighScores_lengthy();
+		// add in the new one
+		highScores.Add(new HighScore(playerName,finalScore,finalTime,finalDistance));
+		// save the list
+		HighScore.saveHighScores(highScores);
+		}
 
 
 	// fuel functions
@@ -195,6 +260,20 @@ public class GameplayManagement:MonoBehaviour
 		float secondsDecimal=0.01f*Mathf.RoundToInt(100*(seconds-secondsFloored));
 		int minutes=secondsFloored/60;
 		float secondsFinal=(int)(secondsFloored-(60*minutes))+secondsDecimal;
-		return minutes+"'"+secondsFinal+"''";
+		if (secondsFinal<10) return minutes+"'0"+secondsFinal+"''";
+		else return minutes+"'"+secondsFinal+"''";
+		}
+
+
+	public string backspaced(string str)
+		{
+		switch (str.Length)
+			{
+			case 0:
+			case 1:
+				return "";
+			default:
+				return str.Substring(0,str.Length-1);
+			}
 		}
 	}

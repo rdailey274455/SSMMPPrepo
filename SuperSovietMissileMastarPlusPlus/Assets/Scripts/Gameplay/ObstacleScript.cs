@@ -9,6 +9,7 @@ public class ObstacleScript:MonoBehaviour
 	private SpriteRenderer mySprRen;
 	private Rigidbody2D myRB;
 	private Collider2D myCollider;
+	private AudioSource myAudioSource;
 	public GameObject missileObject;
 	public GameObject gameplayManagerObject;
 	private GameplayManagement gameplayManagerScript;
@@ -16,7 +17,13 @@ public class ObstacleScript:MonoBehaviour
 	private Collider2D liveZoneCollider;
 	private bool unhit=true;
 	public Color hitColor=new Color(0.75f,0.75f,0.75f,0.55f);
+	private bool isHelicopter;
 	private float lowestDistance;
+	private float distThresh1=4f;
+	private bool distThresh1_passed=false;
+	private float distThresh2=3f;
+	private bool distThresh2_passed=false;
+	
 
 	// Use this for initialization
 	void Start()
@@ -26,19 +33,23 @@ public class ObstacleScript:MonoBehaviour
 		if (gameplayManagerObject==null) gameplayManagerObject=GameObject.FindGameObjectWithTag("GameplayManager");
 
 
-
 		mySprRen=GetComponent<SpriteRenderer>();
 		myRB=GetComponent<Rigidbody2D>();
 		myCollider=GetComponent<BoxCollider2D>();
+		myAudioSource=GetComponent<AudioSource>();
 		liveZoneCollider=liveZoneObject.GetComponent<Collider2D>();
 		gameplayManagerScript=gameplayManagerObject.GetComponent<GameplayManagement>();
 
-		myRB.velocity=new Vector2(speed,0f);
-		if (mySprRen.sprite.name.Equals("helicopter"))
-			{
-			myRB.velocity=new Vector2(speed,-1.4f*(transform.position.y/(transform.position.x*speed)));
-			}
+		
+		if (gameObject.name=="Helicopter" || gameObject.name=="Helicopter(Clone)" || mySprRen.sprite.name.Equals("helicopter")) isHelicopter=true;
 
+
+		myRB.velocity=new Vector2(speed*gameplayManagerScript.getSpeedMult(),0f);
+		
+		if (isHelicopter)
+			{
+			myRB.velocity=new Vector2(myRB.velocity.x,-(transform.position.y/transform.position.x)*Random.value*Mathf.Abs(speed));
+			}
 
 		if (gameplayManagerScript.getMissionStatus()) lowestDistance=distance(missileObject.transform.position,transform.position);
 		}
@@ -48,8 +59,21 @@ public class ObstacleScript:MonoBehaviour
 		{
 		if (gameplayManagerScript.getMissionStatus())
 			{
+			// distance stuff
 			float currentDistance=distance(missileObject.transform.position,transform.position);
 			if (currentDistance<lowestDistance) lowestDistance=currentDistance;
+			if (!distThresh1_passed && currentDistance<=distThresh1)
+				{
+				distThresh1_passed=true;
+				myAudioSource.clip=(AudioClip)Resources.Load("Audio/dingdong1");
+				myAudioSource.Play();
+				}
+			if (!distThresh2_passed && currentDistance<=distThresh2)
+				{
+				distThresh2_passed=true;
+				myAudioSource.clip=(AudioClip)Resources.Load("Audio/dingdong2");
+				myAudioSource.Play();
+				}
 			}
 		}
 

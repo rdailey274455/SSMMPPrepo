@@ -51,7 +51,8 @@ AudioSource:
   m_GameObject: {fileID: 1658077862700284}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 243888940020999722, guid: 9cb949fc57ac5ce44a590fab04a52099,
+    type: 2}
   m_audioClip: {fileID: 8300000, guid: dcc4577af261a344cbca568849fbd624, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.6
@@ -142,7 +143,7 @@ ParticleSystem:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1658077862700284}
   serializedVersion: 5
-  lengthInSec: 0.5
+  lengthInSec: 1
   simulationSpeed: 1
   looping: 0
   prewarm: 0
@@ -192,14 +193,14 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: 548348182
+  randomSeed: 255880063
   InitialModule:
     serializedVersion: 3
     enabled: 1
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.5
+      scalar: 2
       minScalar: 5
       maxCurve:
         serializedVersion: 2

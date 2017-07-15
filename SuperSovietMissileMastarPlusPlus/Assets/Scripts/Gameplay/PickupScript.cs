@@ -43,7 +43,7 @@ public class PickupScript:MonoBehaviour
 
 		liveZoneCollider=liveZoneObject.GetComponent<Collider2D>();
 
-		myRB.velocity=new Vector2(speed,0f);
+		myRB.velocity=new Vector2(speed*gameplayManagerScript.getSpeedMult(),0f);
 		}
 	
 	// Update is called once per frame

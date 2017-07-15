@@ -126,7 +126,7 @@ public class MissileScript:MonoBehaviour
 			offscreenArrowObject.transform.position=arrowMidwayPosition;
 			offscreenArrowObject.transform.rotation=Quaternion.Euler(0f,0f,arrowAngle);
 
-			if (!sirenAudioSource.isPlaying) sirenAudioSource.Play();
+			if (gameplayManagerScript.getMissionStatus() && !sirenAudioSource.isPlaying) sirenAudioSource.Play();
 			}
 		else
 			{
