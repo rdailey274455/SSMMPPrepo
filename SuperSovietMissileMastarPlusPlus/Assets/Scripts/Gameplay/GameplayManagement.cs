@@ -60,6 +60,14 @@ public class GameplayManagement:MonoBehaviour
 		if (missileObject==null) missileObject=GameObject.FindGameObjectWithTag("Missile");
 
 		missionReportTextComponent=missionReportText.GetComponent<Text>();
+
+
+		// mission start text
+		GameObject missionStartText=showScoreChange(
+			missionOverText.transform.position,
+			0f);
+		missionStartText.GetComponent<Text>().text="Mission Start";
+		missionStartText.GetComponent<ScoreChangeTextScript>().alphaDecreasePerSec=1f/2.5f;
 		}
 
 	void Update()
@@ -150,12 +158,15 @@ public class GameplayManagement:MonoBehaviour
 		}
 	public void newHighScore()
 		{
+		Application.Quit();
+		/*
 		// load the list of high scores
 		List<HighScore> highScores=HighScore.loadHighScores_lengthy();
 		// add in the new one
 		highScores.Add(new HighScore(playerName,finalScore,finalTime,finalDistance));
 		// save the list
 		HighScore.saveHighScores(highScores);
+		*/
 		}
 
 
@@ -163,7 +174,7 @@ public class GameplayManagement:MonoBehaviour
 	private void updateMissileFuel(bool thrusting)
 		{
 		if (thrusting) missile_fuel-=missile_fuel_burn*Time.deltaTime;
-		else missile_fuel+=missile_fuel_regen*Time.deltaTime;
+		else if (getMissionStatus()) missile_fuel+=missile_fuel_regen*Time.deltaTime;
 		if (missile_fuel>missile_fuel_max) missile_fuel=missile_fuel_max;
 		if (missile_fuel<0f) missile_fuel=0f;
 		}
@@ -232,17 +243,20 @@ public class GameplayManagement:MonoBehaviour
 		if (getMissionStatus()) gameScore+=totalLossFromObstacle;
 		return totalLossFromObstacle;
 		}
-	public void showScoreChange(float amount)
+	public GameObject showScoreChange(Vector3 spawnPosition,float amount)
 		{
 		if (getMissionStatus())
 			{
-			GameObject newScoreChangeTextObject=(GameObject)Instantiate(Resources.Load("Prefabs/ScoreChangeText"),
-				new Vector3(scoreText.transform.position.x,scoreText.transform.position.y,scoreText.transform.position.z),
+			GameObject newScoreChangeTextObject=(GameObject)Instantiate(
+				Resources.Load("Prefabs/ScoreChangeText"),
+				spawnPosition,
 				Quaternion.identity);
 			newScoreChangeTextObject.transform.SetParent(hudCanvas.transform);
 			if (amount>=0) newScoreChangeTextObject.GetComponent<Text>().text="+"+amount;
 			else newScoreChangeTextObject.GetComponent<Text>().text="-"+Mathf.Abs(amount);
+			return newScoreChangeTextObject;
 			}
+		return null;
 		}
 
 

@@ -11,8 +11,8 @@ public class HighScore:System.IComparable
 	private float playerDistance;
 	private string playerName;
 
-	private static char seperatorChar='^';
-	private static string highScoresFilePath=System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments)+@"\SSMMPP\";
+	private static char seperatorChar=':';
+	private static string highScoresFilePath=@"C:\smatpo\"; // System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments)+@"\SSMMPP\";
 	private static string highScoresFileName="highscores.txt";
 
 	public HighScore()

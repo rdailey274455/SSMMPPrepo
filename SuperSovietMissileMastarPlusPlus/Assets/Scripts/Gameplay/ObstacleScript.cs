@@ -19,9 +19,9 @@ public class ObstacleScript:MonoBehaviour
 	public Color hitColor=new Color(0.75f,0.75f,0.75f,0.55f);
 	private bool isHelicopter;
 	private float lowestDistance;
-	private float distThresh1=4f;
+	private float distThresh1=5f;
 	private bool distThresh1_passed=false;
-	private float distThresh2=3f;
+	private float distThresh2=3.52f;
 	private bool distThresh2_passed=false;
 	
 
@@ -57,7 +57,7 @@ public class ObstacleScript:MonoBehaviour
 	// Update is called once per frame
 	void Update()
 		{
-		if (gameplayManagerScript.getMissionStatus())
+		if (gameplayManagerScript.getMissionStatus() && unhit)
 			{
 			// distance stuff
 			float currentDistance=distance(missileObject.transform.position,transform.position);
@@ -67,12 +67,14 @@ public class ObstacleScript:MonoBehaviour
 				distThresh1_passed=true;
 				myAudioSource.clip=(AudioClip)Resources.Load("Audio/dingdong1");
 				myAudioSource.Play();
+				gameplayManagerScript.missile_fuel_change(Mathf.RoundToInt(gameplayManagerScript.getMissileMaxFuel()*0.05f));
 				}
 			if (!distThresh2_passed && currentDistance<=distThresh2)
 				{
 				distThresh2_passed=true;
 				myAudioSource.clip=(AudioClip)Resources.Load("Audio/dingdong2");
 				myAudioSource.Play();
+				gameplayManagerScript.missile_HP_change(Mathf.RoundToInt(gameplayManagerScript.getMissileMaxHP()*0.05f));
 				}
 			}
 		}
@@ -85,8 +87,10 @@ public class ObstacleScript:MonoBehaviour
 			if (unhit)
 				{
 				gameplayManagerScript.showScoreChange(
-					gameplayManagerScript.gameScore_dodgedObstacle
-						(damage,GetComponent<BoxCollider2D>(),lowestDistance)); // this will both increase score and show the increase
+					new Vector3(gameplayManagerScript.scoreText.transform.position.x,gameplayManagerScript.scoreText.transform.position.y,gameplayManagerScript.scoreText.transform.position.z),
+					gameplayManagerScript.gameScore_dodgedObstacle(
+						damage,GetComponent<BoxCollider2D>(),
+						lowestDistance)); // this will both increase score and show the increase
 				}
 			// die
 			Destroy(gameObject);
@@ -119,8 +123,10 @@ public class ObstacleScript:MonoBehaviour
 
 			// lose points
 			gameplayManagerScript.showScoreChange(
-				gameplayManagerScript.gameScore_hitObstacle
-					(damage,GetComponent<BoxCollider2D>())); // this will both lower score and show the loss
+				new Vector3(gameplayManagerScript.scoreText.transform.position.x,gameplayManagerScript.scoreText.transform.position.y,gameplayManagerScript.scoreText.transform.position.z),
+				gameplayManagerScript.gameScore_hitObstacle(
+					damage,
+					GetComponent<BoxCollider2D>())); // this will both lower score and show the loss
 			}
 		if (!unhit)
 			{
